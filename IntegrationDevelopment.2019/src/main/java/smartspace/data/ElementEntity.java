@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -123,6 +124,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
+	@Embedded
 	public Location getLocation() {
 		return location;
 	}
