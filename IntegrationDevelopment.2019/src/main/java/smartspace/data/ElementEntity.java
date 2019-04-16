@@ -11,6 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import smartspace.dao.rdb.MapToJsonConverter;
 
@@ -89,7 +90,8 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-
+	
+	
 	public boolean isExpired() {
 		return expired;
 	}
@@ -123,18 +125,20 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public void setMoreAttributes(Map<String, Object> moreAttributes) {
 		this.moreAttributes = moreAttributes;
 	}
-
+	
 	@Embedded
 	public Location getLocation() {
 		return location;
 	}
-
+	
+	
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
-	@Id
+	
 	@Override
+	@Id
 	public String getKey() {
 		return this.elementId;
 	}
@@ -143,6 +147,63 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public void setKey(String key) {
 		this.elementId = key;
 		
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElementEntity other = (ElementEntity) obj;
+		if (creationTimestamp == null) {
+			if (other.creationTimestamp != null)
+				return false;
+		} else if (!creationTimestamp.equals(other.creationTimestamp))
+			return false;
+		if (creatorEmail == null) {
+			if (other.creatorEmail != null)
+				return false;
+		} else if (!creatorEmail.equals(other.creatorEmail))
+			return false;
+		if (creatorSmartspace == null) {
+			if (other.creatorSmartspace != null)
+				return false;
+		} else if (!creatorSmartspace.equals(other.creatorSmartspace))
+			return false;
+		if (elementId == null) {
+			if (other.elementId != null)
+				return false;
+		} else if (!elementId.equals(other.elementId))
+			return false;
+		if (elementSmartspace == null) {
+			if (other.elementSmartspace != null)
+				return false;
+		} else if (!elementSmartspace.equals(other.elementSmartspace))
+			return false;
+		if (expired != other.expired)
+			return false;
+		if (location == null) {
+			if (other.location != null)
+				return false;
+		} else if (!location.equals(other.location))
+			return false;
+		if (moreAttributes == null) {
+			if (other.moreAttributes != null)
+				return false;
+		} else if (!moreAttributes.equals(other.moreAttributes))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
 	}
 	
 	@Override

@@ -4,7 +4,7 @@ import java.util.List;
 
 import smartspace.data.ActionEntity;
 
-public interface ActionDao {
+public interface ActionDao<actionKey>{
 
 	public ActionEntity create(ActionEntity actionEntity);
 		

@@ -20,10 +20,13 @@ public class RdbElementDao implements ElementDao<String>{
 	private String smartspace;
 	//private AtomicLong serial;
 	
+	public RdbElementDao() {
+	}
+	
 	@Autowired
 	public RdbElementDao(ElementCrud elementCrud, GeneratorIdCrud generatorIdCrud) {
+		super();
 		this.elementCrud = elementCrud;
-
 		//this.serial = new AtomicLong(1000L);
 		this.generatorIdCrud = generatorIdCrud;
 	}
@@ -39,6 +42,7 @@ public class RdbElementDao implements ElementDao<String>{
 		//elementEntity.setKey(smartspace + "#" + serial.getAndIncrement());
 		GeneratorId idEntity = this.generatorIdCrud.save(new GeneratorId());
 		elementEntity.setKey(smartspace + "#" + idEntity.getId());
+		elementEntity.setElementSmartspace(this.smartspace);
 		this.generatorIdCrud.delete(idEntity);
 		
 		// SQL: INSERT

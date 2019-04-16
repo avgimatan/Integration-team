@@ -1,6 +1,5 @@
 package smartspace.data;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
@@ -12,7 +11,6 @@ public class Location {
 	public Location(){
 	}
 	
-	@Column(name="X")
 	public double getX() {
 		return x;
 	}

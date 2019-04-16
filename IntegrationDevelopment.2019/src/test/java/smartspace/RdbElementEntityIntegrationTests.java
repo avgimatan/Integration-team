@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.After;
 import org.junit.Test;
@@ -27,7 +30,7 @@ public class RdbElementEntityIntegrationTests {
 	private EntityFactory factory;
 	
 	@Autowired
-	public void setMessageDao(ElementDao<String> elementDao) {
+	public void setElementDao(ElementDao<String> elementDao) {
 		this.elementDao = elementDao;
 	}
 	
@@ -46,7 +49,7 @@ public class RdbElementEntityIntegrationTests {
 		
 		// GIVEN the database is clean
 		
-		// WHEN we create a new message with text "Test" and store it in DB
+		// WHEN we create a new element with name "Test" and store it in DB
 		String text = "Test";
 		ElementEntity elementEntity = 
 			this.factory.createNewElement(text, "Task", new Location(1.0,1.0),
@@ -59,5 +62,28 @@ public class RdbElementEntityIntegrationTests {
 			.get()
 			.extracting("elementId", "name")
 			.containsExactly(actual.getKey(), text);
+	}
+	
+	@Test
+	public void testCreateElementsAndVerifyUniqueKeys () throws Exception{
+		// GIVEN clean database 
+
+		// WHEN I create 20 Tasks
+		int size = 20;
+		Set<String> keysSet = 
+				IntStream
+				.range(1, size + 1) //Integer Stream
+				.mapToObj(i->this.factory.createNewElement(
+						"Task #" + i, 
+						"Task", new Location(1.0,1.0),
+						new Date(), "tavb@gmail.com", "2019b.dana.zuka"
+						,false, new HashMap<>())) // MessageEntity Stream
+				.map(this.elementDao::create)// taskseEntity Stream
+				.map(ElementEntity::getKey) // String Stream
+				.collect(Collectors.toSet());
+
+		// THEN they all have unique keys
+		assertThat(keysSet)
+		.hasSize(size);
 	}
 }

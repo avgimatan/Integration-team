@@ -51,31 +51,32 @@ public class ElementEntiyDaoDemoIntegrationTests {
 
 	@Test
 	public void createManyElementsTests() throws Exception {
-		// GIVEN we have a clean dao
+		// GIVEN we have a clean DAO
 		// AND we have a factory
 
 		// WHEN I create 20 elements
 		List<ElementEntity> allTasks = IntStream.range(1, 21) // int Stream
 				.mapToObj(num -> "task #" + num) // String Stream
 				.map(task -> // ElementEntity Stream
-				this.factory.createNewElement("task1", "Task", new Location(1.0,1.0), new Date(), "tavb@gmail.com",
-						"2019b.dana.zuka",false, new HashMap<>()))
+				this.factory.createNewElement("task1", "Task", new Location(1.0, 1.0), new Date(), "tavb@gmail.com",
+						"2019b.dana.zuka", false, new HashMap<>()))
 				.map(this.elementDao::create) // ElementEntity Stream
 				.collect(Collectors.toList());
 
 		// check for failed ( for failed do // on line "this.elementDao.create(e);" )
-		ElementEntity e = this.factory.createNewElement("task1", "Task", new Location(1.0,1.0), new Date(), "tavb@gmail.com",
-				"2019b.dana.zuka",false, new HashMap<>());
-		this.elementDao.create(e);
-		allTasks.add(e);
+		/*
+		 * ElementEntity e = this.factory.createNewElement("task1", "Task", new
+		 * Location(1.0,1.0), new Date(), "tavb@gmail.com", "2019b.dana.zuka",false, new
+		 * HashMap<>()); this.elementDao.create(e); allTasks.add(e);
+		 */
 
-		// THEN the dao contains 20 elements
-		assertThat(this.elementDao.readAll()).containsAll(allTasks);
+		// THEN the DAO contains 20 elements
+		assertThat(this.elementDao.readAll().containsAll(allTasks));
 	}
 
 	@Test
 	public void testCreateUpdateReadByKeyDeleteAllReadAll() throws Exception {
-		// GIVEN we have a dao
+		// GIVEN we have a DAO
 		// AND we have a factory
 
 		// WHEN I create a new element
@@ -90,8 +91,8 @@ public class ElementEntiyDaoDemoIntegrationTests {
 		moreAttributes.put("priority", 1);
 		moreAttributes.put("status", enumStatus.InProcess);
 		moreAttributes.put("employeesAssigned", Arrays.asList(cleaningEmployees));
-		ElementEntity task1 = this.factory.createNewElement("task1", "Task", new Location(1.0,1.0), new Date(), "tavb@gmail.com",
-				"2019b.dana.zuka",false, moreAttributes);
+		ElementEntity task1 = this.factory.createNewElement("task1", "Task", new Location(1.0, 1.0), new Date(),
+				"tavb@gmail.com", "2019b.dana.zuka", false, moreAttributes);
 
 		task1 = elementDao.create(task1);
 		ElementEntity initTask = new ElementEntity();
@@ -121,6 +122,22 @@ public class ElementEntiyDaoDemoIntegrationTests {
 		assertThat(elementOp).isPresent().get().extracting("key").doesNotContain((String) null);
 		assertThat(listAfterDeletion).isEmpty();
 
+	}
+
+
+	@Test
+	public void addElementDeleteAndCheck() throws Exception {
+		// GIVEN we have a DAO
+
+		// WHEN we create element 
+		// AND update 
+		ElementEntity em = this.factory.createNewElement("tst", "Test", new Location(1.0, 1.0), new Date(),
+				"sh@gmail.com", "2019b.dana.zuka", false, new HashMap<>());
+		elementDao.create(em);
+		this.elementDao.deleteAll();
+		
+		// THAN the DOA empty
+		assertThat(this.elementDao.readAll().isEmpty());
 	}
 
 }

@@ -31,6 +31,7 @@ public class MemoryUserDao implements UserDao<String> {
 	@Override
 	public UserEntity create(UserEntity user) {
 		user.setKey(smartspace + "#" + serial.getAndIncrement());
+		user.setUserSmartspace(smartspace);
 		this.memory.put(user.getKey(), user);
 		return user;
 	}

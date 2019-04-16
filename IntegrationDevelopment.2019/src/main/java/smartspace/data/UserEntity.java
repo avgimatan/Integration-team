@@ -6,6 +6,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name="USERS")
@@ -32,6 +33,7 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.points = points;
 	}
 
+	@Transient
 	public String getUserSmartspace() {
 		return userSmartspace;
 	}
@@ -39,7 +41,8 @@ public class UserEntity implements SmartspaceEntity<String> {
 	public void setUserSmartspace(String userSmartspace) {
 		this.userSmartspace = userSmartspace;
 	}
-
+	
+	@Transient
 	public String getUserEmail() {
 		return userEmail;
 	}
@@ -64,7 +67,7 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.avatar = avatar;
 	}
 
-	@Embedded
+	//@Embedded
 	public long getPoints() {
 		return points;
 	}

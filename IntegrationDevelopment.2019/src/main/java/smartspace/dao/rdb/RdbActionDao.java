@@ -12,7 +12,7 @@ import smartspace.dao.ActionDao;
 import smartspace.data.ActionEntity;
 
 @Repository
-public class RdbActionDao implements ActionDao{
+public class RdbActionDao implements ActionDao<String>{
 	
 	private ActionCrud actionCrud;
 	private GeneratorIdCrud generatorIdCrud;
@@ -22,6 +22,7 @@ public class RdbActionDao implements ActionDao{
 	
 	@Autowired
 	public RdbActionDao(ActionCrud actionCrud, GeneratorIdCrud generatorIdCrud) {
+		super();
 		this.actionCrud = actionCrud;
 
 		//this.serial = new AtomicLong(1000L);
@@ -39,6 +40,7 @@ public class RdbActionDao implements ActionDao{
 		//actionEntity.setKey(smartspace + "#" + serial.getAndIncrement());
 		GeneratorId idEntity = this.generatorIdCrud.save(new GeneratorId());
 		actionEntity.setKey(smartspace + "#" + idEntity.getId());
+		actionEntity.setActionSmartspace(smartspace);
 		this.generatorIdCrud.delete(idEntity);
 		
 		// SQL: INSERT

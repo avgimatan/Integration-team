@@ -13,7 +13,7 @@ import smartspace.dao.ActionDao;
 import smartspace.data.ActionEntity;
 
 // @Repository
-public class MemoryActionDao implements ActionDao{
+public class MemoryActionDao implements ActionDao<String>{
 	
 	private Map<String, ActionEntity> memory;
 	private AtomicLong serial;
@@ -32,6 +32,7 @@ public class MemoryActionDao implements ActionDao{
 	@Override
 	public ActionEntity create(ActionEntity actionEntity) {
 		actionEntity.setKey(smartspace + "#" + serial.getAndIncrement());
+		actionEntity.setActionSmartspace(smartspace);
 		this.memory.put(actionEntity.getKey(), actionEntity);
 		return actionEntity;
 	}

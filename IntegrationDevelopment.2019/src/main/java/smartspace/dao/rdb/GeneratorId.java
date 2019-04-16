@@ -3,8 +3,10 @@ package smartspace.dao.rdb;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="GENERATOR_ID")
 public class GeneratorId {
 	private Long id;
 	

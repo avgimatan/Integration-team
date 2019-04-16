@@ -20,6 +20,7 @@ public class RdbUserDao implements UserDao<String> {
 
 	@Autowired
 	public RdbUserDao(UserCrud userCrud) {
+		super();
 		this.userCrud = userCrud;
 	}
 

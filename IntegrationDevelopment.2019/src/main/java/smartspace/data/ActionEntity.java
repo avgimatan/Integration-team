@@ -14,10 +14,9 @@ import javax.persistence.TemporalType;
 import smartspace.dao.rdb.MapToJsonConverter;
 
 @Entity
-@Table(name="ACTIONS")
-public class ActionEntity implements SmartspaceEntity<String>{
+@Table(name = "ACTIONS")
+public class ActionEntity implements SmartspaceEntity<String> {
 
-	private String key;
 	private String actionSmartspace;
 	private String actionId;
 	private String elementSmartspace;
@@ -26,11 +25,11 @@ public class ActionEntity implements SmartspaceEntity<String>{
 	private String playerEmail;
 	private String actionType;
 	private Date creationTimestamp;
-	private Map<String,Object> moreAttributes;
-	
+	private Map<String, Object> moreAttributes;
+
 	public ActionEntity() {
 	}
-	
+
 	public ActionEntity(String elementSmartspace, String elementId, String playerSmartspace, String playerEmail,
 			String actionType, Date creationTimestamp, Map<String, Object> moreAttributes) {
 		super();
@@ -42,91 +41,146 @@ public class ActionEntity implements SmartspaceEntity<String>{
 		this.creationTimestamp = creationTimestamp;
 		this.moreAttributes = moreAttributes;
 	}
-	
+
 	public String getActionSmartspace() {
 		return actionSmartspace;
 	}
-	
+
 	public void setActionSmartspace(String actionSmartspace) {
 		this.actionSmartspace = actionSmartspace;
 	}
-	
-	@Id
-	public String getActionId() {
-		return actionId;
-	}
-	
-	public void setActionId(String actionId) {
-		this.actionId = actionId;
-	}
-	
+
 	public String getElementSmartspace() {
 		return elementSmartspace;
 	}
-	
+
 	public void setElementSmartspace(String elementSmartspace) {
 		this.elementSmartspace = elementSmartspace;
 	}
-	
+
 	public String getElementId() {
 		return elementId;
 	}
-	
+
 	public void setElementId(String elementId) {
 		this.elementId = elementId;
 	}
-	
+
 	public String getPlayerSmartspace() {
 		return playerSmartspace;
 	}
-	
+
 	public void setPlayerSmartspace(String playerSmartspace) {
 		this.playerSmartspace = playerSmartspace;
 	}
-	
+
 	public String getPlayerEmail() {
 		return playerEmail;
 	}
-	
+
 	public void setPlayerEmail(String playerEmail) {
 		this.playerEmail = playerEmail;
 	}
-	
+
 	public String getActionType() {
 		return actionType;
 	}
-	
+
 	public void setActionType(String actionType) {
 		this.actionType = actionType;
 	}
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getCreationTimestamp() {
 		return creationTimestamp;
 	}
-	
+
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-	
+
 	@Lob
-	@Convert(converter=MapToJsonConverter.class)
+	@Convert(converter = MapToJsonConverter.class)
 	public Map<String, Object> getMoreAttributes() {
 		return moreAttributes;
 	}
-	
+
 	public void setMoreAttributes(Map<String, Object> moreAttributes) {
 		this.moreAttributes = moreAttributes;
 	}
 
+	public String getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
+	}
+
+	@Id
 	@Override
 	public String getKey() {
-		return this.key;
+		return this.actionId;
 	}
 
 	@Override
-	public void setKey(String key) {
-		this.key = key;
-		
+	public void setKey(String actionId) {
+		this.actionId = actionId;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ActionEntity other = (ActionEntity) obj;
+		if (creationTimestamp == null) {
+			if (other.creationTimestamp != null)
+				return false;
+		} else if (!creationTimestamp.equals(other.creationTimestamp))
+			return false;
+		if (elementId == null) {
+			if (other.elementId != null)
+				return false;
+		} else if (!elementId.equals(other.elementId))
+			return false;
+		if (elementSmartspace == null) {
+			if (other.elementSmartspace != null)
+				return false;
+		} else if (!elementSmartspace.equals(other.elementSmartspace))
+			return false;
+		if (moreAttributes == null) {
+			if (other.moreAttributes != null)
+				return false;
+		} else if (!moreAttributes.equals(other.moreAttributes))
+			return false;
+		if (actionSmartspace == null) {
+			if (other.actionSmartspace != null)
+				return false;
+		} else if (!actionSmartspace.equals(other.actionSmartspace))
+			return false;
+		if (actionId == null) {
+			if (other.actionId != null)
+				return false;
+		} else if (!actionId.equals(other.actionId))
+			return false;
+		if (playerSmartspace == null) {
+			if (other.playerSmartspace != null)
+				return false;
+		} else if (!playerSmartspace.equals(other.playerSmartspace))
+			return false;
+		if (playerEmail == null) {
+			if (other.playerEmail != null)
+				return false;
+		} else if (!playerEmail.equals(other.playerEmail))
+			return false;
+		if (actionType == null) {
+			if (other.actionType != null)
+				return false;
+		} else if (!actionType.equals(other.actionType))
+			return false;
+		return true;
+	}
+
 }

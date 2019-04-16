@@ -25,6 +25,9 @@ public class ElementEntityDemo implements CommandLineRunner {
 	private ElementDao<String> elementDao;
 	private AtomicLong serial;
 
+	public ElementEntityDemo() {
+	}
+	
 	@Autowired
 	public ElementEntityDemo(EntityFactoryImpl factory, ElementDao<String> elementDao) {
 		this.factory = factory;
