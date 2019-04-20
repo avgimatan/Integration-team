@@ -81,7 +81,7 @@ public class MemoryElementDao implements ElementDao<String>{
 		if(updateElementEntity.getCreatorSmartspace() != null) {
 			existing.setCreatorSmartspace(updateElementEntity.getCreatorSmartspace());
 		}
-		existing.setExpired(updateElementEntity.isExpired());
+		existing.setExpired(updateElementEntity.getExpired());
 			
 	}
 

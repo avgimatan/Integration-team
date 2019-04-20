@@ -3,6 +3,7 @@ package smartspace.data;
 import java.util.Date;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,6 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import smartspace.dao.rdb.MapToJsonConverter;
 
@@ -42,6 +44,7 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
+	@Transient
 	public String getActionSmartspace() {
 		return actionSmartspace;
 	}
@@ -109,6 +112,7 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
+	@Transient
 	public String getActionId() {
 		return actionId;
 	}
@@ -119,13 +123,15 @@ public class ActionEntity implements SmartspaceEntity<String> {
 
 	@Id
 	@Override
+	@Column(name="ID")
 	public String getKey() {
-		return this.actionId;
+		return this.actionSmartspace + "#" + this.actionId;
 	}
 
 	@Override
-	public void setKey(String actionId) {
-		this.actionId = actionId;
+	public void setKey(String key) {
+		this.actionSmartspace = key.split("#")[0];
+		this.actionId = key.split("#")[1];
 	}
 
 	@Override

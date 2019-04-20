@@ -12,7 +12,7 @@ import smartspace.dao.ActionDao;
 import smartspace.data.ActionEntity;
 
 @Repository
-public class RdbActionDao implements ActionDao<String>{
+public class RdbActionDao implements ActionDao{
 	
 	private ActionCrud actionCrud;
 	private GeneratorIdCrud generatorIdCrud;

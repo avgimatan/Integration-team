@@ -82,6 +82,8 @@ public class RdbUserDao implements UserDao<String> {
 		if (user.getUsername() != null) {
 			existing.setUsername(user.getUsername());
 		}
+		
+		existing.setPoints(user.getPoints());
 
 		// SQL: UPDATE
 		this.userCrud.save(existing);

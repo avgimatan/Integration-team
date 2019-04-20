@@ -98,7 +98,7 @@ public class RdbElementDao implements ElementDao<String>{
 		if(updateElementEntity.getCreatorSmartspace() != null) {
 			existing.setCreatorSmartspace(updateElementEntity.getCreatorSmartspace());
 		}
-		existing.setExpired(updateElementEntity.isExpired());
+		existing.setExpired(updateElementEntity.getExpired());
 		
 		// SQL: UPDATE
 		this.elementCrud.save(existing);

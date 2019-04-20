@@ -13,7 +13,7 @@ import smartspace.dao.ActionDao;
 import smartspace.data.ActionEntity;
 
 // @Repository
-public class MemoryActionDao implements ActionDao<String>{
+public class MemoryActionDao implements ActionDao{
 	
 	private Map<String, ActionEntity> memory;
 	private AtomicLong serial;

@@ -14,6 +14,8 @@ public class MemoryElementDaoUpdateUnitTests {
 		// GIVEN a dao is available
 		MemoryElementDao dao = new MemoryElementDao();
 		// AND a element entity is added to the dao
+		String smartspace = "smartspace";
+		dao.setSmartspace(smartspace);
 		ElementEntity elementEntity = new ElementEntity();
 		elementEntity = dao.create(elementEntity);
 		ElementEntity updateEntity = new ElementEntity();

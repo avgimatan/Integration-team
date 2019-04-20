@@ -3,6 +3,7 @@ package smartspace.data;
 import java.util.Date;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ import javax.persistence.Transient;
 import smartspace.dao.rdb.MapToJsonConverter;
 
 @Entity
-@Table(name="ELEMENTS")
+@Table(name = "ELEMENTS")
 public class ElementEntity implements SmartspaceEntity<String> {
 
 	private String elementSmartspace;
@@ -28,27 +29,26 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	private boolean expired;
 	private String creatorSmartspace; // the smartSpace of the other user who create the element
 	private String creatorEmail;
-	private Map<String,Object> moreAttributes;
-	
+	private Map<String, Object> moreAttributes;
+
 	public ElementEntity() {
 	}
-	
-	public ElementEntity(String name, String type,Location location,
-			Date creationTimestamp,String creatorEmail,
-			String creatorSmartspace, boolean expired,
-			Map<String, Object> moreAttributes) {		
+
+	public ElementEntity(String name, String type, Location location, Date creationTimestamp, String creatorEmail,
+			String creatorSmartspace, boolean expired, Map<String, Object> moreAttributes) {
 		super();
 		this.location = location;
 		this.name = name;
-		this.type= type;
-		this.creationTimestamp =  creationTimestamp;
+		this.type = type;
+		this.creationTimestamp = creationTimestamp;
 		this.expired = expired;
 		this.creatorSmartspace = creatorSmartspace;
 		this.creatorEmail = creatorEmail;
 		this.moreAttributes = moreAttributes;
-		
+
 	}
-	
+
+	@Transient
 	public String getElementId() {
 		return elementId;
 	}
@@ -57,11 +57,11 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.elementId = elementId;
 	}
 
-	
+	@Transient
 	public String getElementSmartspace() {
-		return elementSmartspace;
+		return this.elementSmartspace;
 	}
-	
+
 	public void setElementSmartspace(String smartspace) {
 		this.elementSmartspace = smartspace;
 	}
@@ -90,9 +90,8 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-	
-	
-	public boolean isExpired() {
+
+	public boolean getExpired() {
 		return expired;
 	}
 
@@ -117,7 +116,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	}
 
 	@Lob
-	@Convert(converter=MapToJsonConverter.class)
+	@Convert(converter = MapToJsonConverter.class)
 	public Map<String, Object> getMoreAttributes() {
 		return moreAttributes;
 	}
@@ -125,30 +124,29 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public void setMoreAttributes(Map<String, Object> moreAttributes) {
 		this.moreAttributes = moreAttributes;
 	}
-	
+
 	@Embedded
 	public Location getLocation() {
 		return location;
 	}
-	
-	
+
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
-	
 	@Override
 	@Id
+	@Column(name="ID")
 	public String getKey() {
-		return this.elementId;
+		return this.elementSmartspace + "#" + this.elementId;
 	}
 
 	@Override
 	public void setKey(String key) {
-		this.elementId = key;
-		
+		this.elementSmartspace = key.split("#")[0];
+		this.elementId = key.split("#")[1];
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
@@ -205,12 +203,12 @@ public class ElementEntity implements SmartspaceEntity<String> {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "ElementEntity [elementSmartspace=" + getElementSmartspace() + ", elementId=" + getKey() + 
-				", location=" + getLocation() + ", name=" + getName() + ", type=" + getType() + ", creationTimestamp=" + getCreationTimestamp() + 
-				", expired=" + isExpired() + ", creatorSmartspace=" + getCreatorSmartspace() + ", creatorEmail=" + getCreatorEmail() + 
-				", moreAttributes=" + getMoreAttributes() + "]";
+		return "ElementEntity [elementSmartspace=" + getElementSmartspace() + ", elementId=" + getKey() + ", location="
+				+ getLocation() + ", name=" + getName() + ", type=" + getType() + ", creationTimestamp="
+				+ getCreationTimestamp() + ", expired=" + getExpired() + ", creatorSmartspace=" + getCreatorSmartspace()
+				+ ", creatorEmail=" + getCreatorEmail() + ", moreAttributes=" + getMoreAttributes() + "]";
 	}
 }

@@ -1,5 +1,6 @@
 package smartspace.data;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -67,7 +68,6 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.avatar = avatar;
 	}
 
-	//@Embedded
 	public long getPoints() {
 		return points;
 	}
@@ -87,13 +87,13 @@ public class UserEntity implements SmartspaceEntity<String> {
 
 	@Id
 	@Override
+	@Column(name="ID")
 	public String getKey() {
 		return userSmartspace + "#" + userEmail;
 	}
 
 	@Override
 	public void setKey(String key) {
-		// TODO
 		this.userSmartspace = key.split("#")[0];
 		this.userEmail = key.split("#")[1];
 	}

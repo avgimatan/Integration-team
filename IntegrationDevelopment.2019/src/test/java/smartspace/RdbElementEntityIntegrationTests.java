@@ -61,7 +61,7 @@ public class RdbElementEntityIntegrationTests {
 			.isPresent()
 			.get()
 			.extracting("elementId", "name")
-			.containsExactly(actual.getKey(), text);
+			.containsExactly(actual.getKey().split("#")[1], text);
 	}
 	
 	@Test
