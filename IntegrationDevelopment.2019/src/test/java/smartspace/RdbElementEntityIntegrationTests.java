@@ -55,7 +55,7 @@ public class RdbElementEntityIntegrationTests {
 			this.factory.createNewElement(text, "Task", new Location(1.0,1.0),
 					new Date(), "tavb@gmail.com", "2019b.dana.zuka",false, new HashMap<>());
 		ElementEntity actual = this.elementDao.create(elementEntity);
-				
+
 		// THEN the element is stored 
 		assertThat(this.elementDao.readById(actual.getKey()))
 			.isPresent()

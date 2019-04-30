@@ -55,7 +55,7 @@ public class MemoryUserDao implements UserDao<String> {
 	public void update(UserEntity updateUser) {
 
 		UserEntity existing = this.readById(updateUser.getKey())
-				.orElseThrow(() -> new RuntimeException("no message entity with key: " + updateUser.getKey()));
+				.orElseThrow(() -> new RuntimeException("no element entity with key: " + updateUser.getKey()));
 
 		if(updateUser.getAvatar() != null) {
 			existing.setAvatar(updateUser.getAvatar());

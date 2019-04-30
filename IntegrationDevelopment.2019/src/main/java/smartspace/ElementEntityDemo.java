@@ -23,7 +23,6 @@ public class ElementEntityDemo implements CommandLineRunner {
 
 	private EntityFactoryImpl factory;
 	private ElementDao<String> elementDao;
-	private AtomicLong serial;
 
 	public ElementEntityDemo() {
 	}
@@ -32,7 +31,6 @@ public class ElementEntityDemo implements CommandLineRunner {
 	public ElementEntityDemo(EntityFactoryImpl factory, ElementDao<String> elementDao) {
 		this.factory = factory;
 		this.elementDao = elementDao;
-		this.serial = new AtomicLong(1L);
 	}
 
 	@Override
@@ -52,12 +50,12 @@ public class ElementEntityDemo implements CommandLineRunner {
 		taskDetails.put("employeesAssigned", Arrays.asList(cleaningEmployees));
 
 		// create task by 'createNewElementEntity' method
-		ElementEntity task1 = this.factory.createNewElement(tasksBaseName + serial.getAndIncrement(), "Task", new Location(1.0, 1.0),
+		ElementEntity task1 = this.factory.createNewElement(tasksBaseName, "Task", new Location(1.0, 1.0),
 				new Date(), "tavb@mail.afeka.ac.il", smartspace, false, taskDetails);
 
 		task1 = this.elementDao.create(task1);
 		
-		ElementEntity task2 = this.factory.createNewElement(tasksBaseName + serial.getAndIncrement(), "Task", new Location(2.0, 2.0),
+		ElementEntity task2 = this.factory.createNewElement(tasksBaseName, "Task", new Location(2.0, 2.0),
 				new Date(), "tavb@mail.afeka.ac.il", smartspace, false, taskDetails);
 
 		task2 = this.elementDao.create(task2);

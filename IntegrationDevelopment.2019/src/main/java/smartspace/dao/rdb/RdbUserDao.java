@@ -6,14 +6,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import smartspace.dao.UserDao;
+import smartspace.dao.AdvancedUserDao;
 import smartspace.data.UserEntity;
 
 @Repository
-public class RdbUserDao implements UserDao<String> {
+public class RdbUserDao implements AdvancedUserDao<String> {
 
 	private UserCrud userCrud;
 	private String smartspace;
@@ -33,7 +35,6 @@ public class RdbUserDao implements UserDao<String> {
 	@Transactional
 	public UserEntity create(UserEntity user) {
 		user.setKey(smartspace + "#" + user.getUserEmail());
-		user.setUserSmartspace(smartspace);
 
 		// SQL: INSERT
 		if (!this.userCrud.existsById(user.getKey())) {
@@ -70,21 +71,19 @@ public class RdbUserDao implements UserDao<String> {
 		if (user.getAvatar() != null) {
 			existing.setAvatar(user.getAvatar());
 		}
-
 		if (user.getRole() != null) {
 			existing.setRole(user.getRole());
 		}
-		
 		if (user.getUserEmail()!= null) {
 			existing.setUserEmail(user.getUserEmail());
 		}
-		
 		if (user.getUsername() != null) {
 			existing.setUsername(user.getUsername());
 		}
-		
+		if (user.getUserSmartspace() != null) {
+			existing.setUserSmartspace(user.getUserSmartspace());
+		}
 		existing.setPoints(user.getPoints());
-
 		// SQL: UPDATE
 		this.userCrud.save(existing);
 	}
@@ -92,7 +91,44 @@ public class RdbUserDao implements UserDao<String> {
 	@Override
 	@Transactional
 	public void deleteAll() {
+		// SQL: DELETE
 		this.userCrud.deleteAll();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readAll(int size, int page) {
+		return this.userCrud.findAll(PageRequest.of(page, size)).getContent();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readAll(String sortBy, int size, int page) {
+		return this.userCrud.findAll(PageRequest.of(page, size, Direction.ASC, sortBy)).getContent();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readUsersByUsernamePattern(String username, int size, int page) {
+		return this.userCrud.findAllByUsernameLike("%" + username + "%", PageRequest.of(page, size));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readUsersByUsernamePattern(String username, String sortBy, int size, int page) {
+		return this.userCrud.findAllByUsernameLike("%" + username + "%", PageRequest.of(page, size, Direction.ASC, sortBy));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readUsersByUserEmailPattern(String userEmail, int size, int page) {
+		return this.userCrud.findAllByKeyLike("%" + userEmail + "%", PageRequest.of(page, size));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserEntity> readUsersByUserEmailPattern(String userEmail, String sortBy, int size, int page) {
+		return this.userCrud.findAllByKeyLike("%" + userEmail + "%", PageRequest.of(page, size, Direction.ASC, sortBy));
 	}
 
 }
