@@ -3,8 +3,6 @@ package smartspace;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -89,7 +87,7 @@ public class ElementEntiyDaoDemoIntegrationTests {
 		moreAttributes.put("departmentName", "clean");
 		moreAttributes.put("taskDescribe", "clean the...");
 		moreAttributes.put("priority", 1);
-		moreAttributes.put("status", enumStatus.InProcess);
+		moreAttributes.put("status", enumStatus.IN_PROGRESS);
 		moreAttributes.put("employeesAssigned", Arrays.asList(cleaningEmployees));
 		ElementEntity task1 = this.factory.createNewElement("task1", "Task", new Location(1.0, 1.0), new Date(),
 				"tavb@gmail.com", "2019b.dana.zuka", false, moreAttributes);

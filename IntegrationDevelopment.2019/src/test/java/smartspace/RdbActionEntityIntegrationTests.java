@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -84,7 +83,6 @@ public class RdbActionEntityIntegrationTests {
 		action = this.actionDao.create(action);
 				
 		// THEN the action is stored 
-		// TODO
 		assertThat(this.actionDao.readAll().contains(action));
 	}
 	

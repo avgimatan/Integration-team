@@ -1,23 +1,26 @@
 package smartspace.data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name="USERS")
+//after change to MongoDB
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
+@Document(collection = "USERS")
 public class UserEntity implements SmartspaceEntity<String> {
-
+	
+	@Transient
 	private String userSmartspace;
+	
+	@Transient
 	private String userEmail;
+	
 	private String username;
 	private String avatar;
 	private UserRole role;
 	private long points;
+	// mongoDB requirement this attribute
+	private String key;
 
 	public UserEntity() {
 	}
@@ -46,7 +49,6 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.points = points;
 	}
 
-	@Transient
 	public String getUserSmartspace() {
 		return userSmartspace;
 	}
@@ -55,7 +57,6 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.userSmartspace = userSmartspace;
 	}
 	
-	@Transient
 	public String getUserEmail() {
 		return userEmail;
 	}
@@ -88,7 +89,6 @@ public class UserEntity implements SmartspaceEntity<String> {
 		this.points = points;
 	}
 
-	@Enumerated(EnumType.STRING)
 	public UserRole getRole() {
 		return role;
 	}
@@ -98,16 +98,15 @@ public class UserEntity implements SmartspaceEntity<String> {
 	}
 
 	@Id
-	@Override
-	@Column(name="ID")
 	public String getKey() {
-		return userSmartspace + "#" + userEmail;
+		return this.key;
 	}
 
 	@Override
 	public void setKey(String key) {
 		this.userSmartspace = key.split("#")[0];
 		this.userEmail = key.split("#")[1];
+		this.key = key;
 	}
 
 	@Override

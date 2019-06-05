@@ -19,37 +19,49 @@ import smartspace.data.ElementEntity;
 public class RdbElementDao implements AdvancedElementDao<String> {
 
 	private ElementCrud elementCrud;
-	private GeneratorIdCrud generatorIdCrud;
 	private String smartspace;
-	// private AtomicLong serial;
-
-	@Autowired
-	public RdbElementDao(ElementCrud elementCrud, GeneratorIdCrud generatorIdCrud) {
-		super();
-		this.elementCrud = elementCrud;
-		// this.serial = new AtomicLong(1000L);
-		this.generatorIdCrud = generatorIdCrud;
-	}
 
 	@Value("${smartspace.name:smartspace}")
 	public void setSmartspace(String smartspace) {
 		this.smartspace = smartspace;
 	}
+	
+	@Autowired
+	public RdbElementDao(ElementCrud elementCrud) {
+		super();
+		this.elementCrud = elementCrud;
+		if(this.elementCrud.count() > 0) {
+			List<ElementEntity> allElements = new ArrayList<>();
+			this.elementCrud.findAll().forEach(allElements::add);
+			
+			List<ElementEntity> filteredElementsBySmartspace = new ArrayList<>();
+			for(ElementEntity element:allElements) {
+				element.setKey(element.getKey());
+				if(element.getElementSmartspace().equals("2019B.dana.zuka")) {
+					filteredElementsBySmartspace.add(element);
+				}
+			}			
+			GeneratedId.setNumOfElements(filteredElementsBySmartspace.size());
+		}
+	}
+
 
 	@Override
 	@Transactional
-	public ElementEntity create(ElementEntity elementEntity) {
-		// elementEntity.setKey(smartspace + "#" + serial.getAndIncrement());
-		GeneratorId idEntity = this.generatorIdCrud.save(new GeneratorId());
-		elementEntity.setKey(smartspace + "#" + idEntity.getId());
-		this.generatorIdCrud.delete(idEntity);
-
+	public ElementEntity create(ElementEntity element) {
+		if (element.getElementSmartspace() != null && element.getElementId() != null)
+			element.setKey(element.getElementSmartspace() + "#" + element.getElementId());
+		else
+			element.setKey(smartspace + "#" + GeneratedId.getNextElementValue());
+				
 		// SQL: INSERT
-		if (!this.elementCrud.existsById(elementEntity.getKey())) {
-			return this.elementCrud.save(elementEntity);
+		if (!this.elementCrud.existsById(element.getKey())) {
+			element.setCreationTimestamp(new Date());
+			return this.elementCrud.save(element);
 		} else {
-			throw new RuntimeException("entity already exists with key: " + elementEntity.getKey());
+			throw new RuntimeException("element already exists with key: " + element.getKey());
 		}
+
 	}
 
 	@Override
@@ -143,14 +155,36 @@ public class RdbElementDao implements AdvancedElementDao<String> {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ElementEntity> readElementsWithCreationTimestampInRange(Date fromDate, Date toDate, int size, int page) {
+	public List<ElementEntity> readElementsWithCreationTimestampInRange(Date fromDate, Date toDate, int size,
+			int page) {
 		return this.elementCrud.findAllByCreationTimestampBetween(fromDate, toDate, PageRequest.of(page, size));
 
 	}
 
 	@Override
 	public List<ElementEntity> readElementByTextPattern(String pattern, String sortBy, int size, int page) {
-		return this.elementCrud.findAllByNameLike("%" + pattern + "%", PageRequest.of(page, size, Direction.ASC, sortBy));
+		return this.elementCrud.findAllByNameLike("%" + pattern + "%",
+				PageRequest.of(page, size, Direction.ASC, sortBy));
 	}
 
+	@Override
+	public List<ElementEntity> readElementsByName(String value, int size, int page) {
+		return this.elementCrud.findAllByNameLikeAndExpiredIsFalse(value, PageRequest.of(page, size));
+
+	}
+
+	@Override
+	public List<ElementEntity> readElementsByType(String value, int size, int page) {
+		return this.elementCrud.findAllByTypeLikeAndExpiredIsFalse(value, PageRequest.of(page, size));
+	}
+
+	@Override
+	public List<ElementEntity> readElementsByDistance(double x, double y, double distance, int size, int page) {
+		double minX = x - distance;
+		double maxX = x + distance;
+		double minY = y - distance;
+		double maxY = y + distance;
+		return this.elementCrud.findAllByLocation_XBetweenAndLocation_YBetweenAndExpiredIsFalse(minX, maxX, minY, maxY,
+				PageRequest.of(page, size));
+	}
 }

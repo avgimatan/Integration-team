@@ -5,24 +5,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-
+import smartspace.aop.PerformanceMonitorAdvice;
 import smartspace.dao.ElementDao;
 import smartspace.data.ElementEntity;
 import smartspace.data.Location;
 import smartspace.data.util.EntityFactoryImpl;
 
-@Component
+//@Component
 @Profile("production")
 public class ElementEntityDemo implements CommandLineRunner {
 
 	private EntityFactoryImpl factory;
 	private ElementDao<String> elementDao;
+	Log log = LogFactory.getLog(PerformanceMonitorAdvice.class);
 
 	public ElementEntityDemo() {
 	}
@@ -46,7 +46,7 @@ public class ElementEntityDemo implements CommandLineRunner {
 		taskDetails.put("departmentName", "clean");
 		taskDetails.put("taskDescribe", "clean the...");
 		taskDetails.put("priority", 1);
-		taskDetails.put("status", enumStatus.InProcess);
+		taskDetails.put("status", enumStatus.IN_PROGRESS);
 		taskDetails.put("employeesAssigned", Arrays.asList(cleaningEmployees));
 
 		// create task by 'createNewElementEntity' method
@@ -61,8 +61,8 @@ public class ElementEntityDemo implements CommandLineRunner {
 		task2 = this.elementDao.create(task2);
 
 		// print tasks
-		System.err.println("stored task1:\n" + task1);
-		System.err.println("stored task2:\n" + task2);
+		log.debug("stored task1:\n" + task1);
+		log.debug("stored task2:\n" + task2);
 
 		Map<String, Object> updatedDetails = new HashMap<>(task1.getMoreAttributes());
 		updatedDetails.put("gender", "male");
@@ -82,7 +82,7 @@ public class ElementEntityDemo implements CommandLineRunner {
 			throw new RuntimeException("Error! element vanished after update");
 		}
 
-		System.err.println("updated element:\n" + task1);
+		log.debug("updated element:\n" + task1);
 
 		// List of tasks
 		String[] departmentTasks = { task1.getName(), task2.getName() };
@@ -98,14 +98,14 @@ public class ElementEntityDemo implements CommandLineRunner {
 		department = this.elementDao.create(department);
 
 		// Print department
-		System.err.println("stored department:\n" + department);
+		log.debug("stored department:\n" + department);
 
 		// Delete all the elements
 		this.elementDao.deleteAll();
 
 		// Check the method 'deleteAll'
 		if (this.elementDao.readAll().isEmpty()) {
-			System.err.println("successfully deleted all the elements");
+			log.debug("successfully deleted all the elements");
 		} else {
 			throw new RuntimeException("Error! the elements still exist after deletion");
 		}

@@ -1,23 +1,26 @@
 package smartspace.layout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import smartspace.data.UserEntity;
 import smartspace.data.UserRole;
 
 public class UserBoundary {
 
-	private String userSmartspace;
-	private String userEmail;
+	private Map<String, String> key;
 	private String username;
 	private String avatar;
 	private String role;
 	private long points;
-	
+
 	public UserBoundary() {
 	}
 
 	public UserBoundary(UserEntity user) {
-		this.userSmartspace = user.getUserSmartspace();
-		this.userEmail = user.getUserEmail();
+		this.key = new HashMap<String, String>();
+		this.key.put("smartspace", user.getUserSmartspace());
+		this.key.put("email", user.getUserEmail());
 		this.username = user.getUsername();
 		this.avatar = user.getAvatar();
 
@@ -25,24 +28,16 @@ public class UserBoundary {
 			this.role = user.getRole().name();
 		else
 			this.role = null;
-		
+
 		this.points = user.getPoints();
 	}
 
-	public String getUserSmartspace() {
-		return userSmartspace;
+	public Map<String, String> getKey() {
+		return key;
 	}
 
-	public void setUserSmartspace(String userSmartspace) {
-		this.userSmartspace = userSmartspace;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
+	public void setKey(String userSmartspace, String userEmail) {
+		this.key.put(userSmartspace, userEmail);
 	}
 
 	public String getUsername() {
@@ -76,32 +71,29 @@ public class UserBoundary {
 	public void setPoints(long points) {
 		this.points = points;
 	}
-	
+
 	public UserEntity convertToEntity() {
 		UserEntity user = new UserEntity();
-		user.setKey(this.userSmartspace + "#" + this.userEmail);
-		
+
+		if (this.key != null && this.key.get("smartspace") != null && this.key.get("email") != null
+				&& !this.key.get("smartspace").trim().isEmpty() && !this.key.get("email").trim().isEmpty())
+			user.setKey(this.key.get("smartspace") + "#" + this.key.get("email"));
 		user.setAvatar(this.avatar);
-		user.setPoints(this.points);
-		user.setUserEmail(this.userEmail);
-		user.setUserSmartspace(this.userSmartspace);
+		if(this.points != 0)
+			user.setPoints(this.points);
 		user.setUsername(this.username);
-		if(this.role != null) {
+		if (this.role != null) {
 			user.setRole(UserRole.valueOf(this.role));
-		}
-		else {
+		} else {
 			user.setRole(null);
 		}
-		
 		return user;
 	}
 
 	@Override
 	public String toString() {
-		return "UserBoundary [userSmartspace=" + userSmartspace + ", userEmail=" + userEmail + ", username=" + username
-				+ ", avatar=" + avatar + ", role=" + role + ", points=" + points + "]";
+		return "UserBoundary [userSmartspace=" + this.key.get("smartspace") + ", userEmail=" + this.key.get("email")
+				+ ", username=" + username + ", avatar=" + avatar + ", role=" + role + ", points=" + points + "]";
 	}
-	
-	
 
 }

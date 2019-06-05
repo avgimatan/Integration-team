@@ -1,5 +1,5 @@
 package smartspace.data;
 
 public enum UserRole {
-	MANAGER, PLAYER, ADMIN; 
+	MANAGER, PLAYER, ADMIN;
 }

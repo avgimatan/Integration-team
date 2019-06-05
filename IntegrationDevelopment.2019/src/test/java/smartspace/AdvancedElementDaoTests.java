@@ -179,46 +179,4 @@ public class AdvancedElementDaoTests {
 
 	}
 	
-	@Test
-	public void testReadElementsWithAvailableFromInRange() throws Exception{
-		
-		// GIVEN the database contain 16 elements from yesterday
-		// AND the database contain 5 elements from now
-		Date yesterday = new Date(System.currentTimeMillis() - 1000*3600*24);
-		IntStream.range(5, 5+16)
-		.mapToObj(i->this.factory.createNewElement("text", "Task",
-				new Location(1.0,1.0),
-				new Date(), 
-				"tavb@gmail.com",
-				"2019b.dana.zuka",
-				false, 
-				new HashMap<String, Object>()))
-		.peek(msg->
-			msg.setCreationTimestamp(yesterday)
-		)
-		.forEach(this.elementDao::create);
-
-		IntStream.range(0, 5)
-		.mapToObj(i->this.factory.createNewElement("text"+i, "Task",
-				new Location(1.0,1.0),
-				new Date(), 
-				"tavb@gmail.com",
-				"2019b.dana.zuka",
-				false, 
-				new HashMap<String, Object>()))
-		.forEach(this.elementDao::create);
-		
-		// WHEN I read 5 elements created between two days ago and one hour ago with skipping first 3 pages
-		Date twoDaysAgo = new Date(System.currentTimeMillis() - 48*3600000);
-		Date oneHourAgo = new Date(System.currentTimeMillis() - 3600000);
-		List<ElementEntity> list = this.elementDao
-				.readElementsWithCreationTimestampInRange(
-						twoDaysAgo, 
-						oneHourAgo,//oneHourAgo, 
-						5, 3);
-		
-		// THEN I receive 1 element
-		assertThat(list)
-			.hasSize(1);
-	}
 }

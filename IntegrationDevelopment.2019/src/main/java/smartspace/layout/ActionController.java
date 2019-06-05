@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import smartspace.data.ActionEntity;
 import smartspace.logic.ActionService;
 
 @RestController
@@ -23,32 +24,52 @@ public class ActionController {
 		this.actionService = actionService;
 	}
 
-	@RequestMapping(path = "/actiondemo", 
-			method = RequestMethod.POST, 
-			consumes = MediaType.APPLICATION_JSON_VALUE, 
+	@RequestMapping(
+			path = "/smartspace/admin/actions/{adminSmartspace}/{adminEmail}",
+			method = RequestMethod.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ActionBoundary writeAction(@RequestBody ActionBoundary action) {
-//		ActionEntity input = action.convertToEntity();
-//		ActionEntity outputEntity = this.ActionService.writeAction(input);
-//		ActionBoundary output = new ActionBoundary(outputEntity);
-//		return output;
+	public ActionBoundary[] importActons(
+			@RequestBody ActionBoundary[] actionBoundaryArray,
+			@PathVariable("adminSmartspace") String adminSmartspace,
+			@PathVariable("adminEmail") String adminEmail) {
 
-		return new ActionBoundary(this.actionService.writeAction(action.convertToEntity()));
+		ActionEntity[] actionEntityArray = new ActionEntity[actionBoundaryArray.length];
+		for (int i = 0; i < actionEntityArray.length; i++)
+			actionEntityArray[i] = actionBoundaryArray[i].convertToEntity();
+
+		return this.actionService.importActions(actionEntityArray, adminSmartspace + "#" + adminEmail).stream()
+				.map(ActionBoundary::new).collect(Collectors.toList()).toArray(new ActionBoundary[0]);
+
 	}
 
-	@RequestMapping(path = "/actiondemo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ActionBoundary[] getActions(@RequestParam(name = "size", required = false, defaultValue = "10") int size,
-			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return this.actionService.getActions(size, page).stream().map(ActionBoundary::new).collect(Collectors.toList())
+	@RequestMapping(
+			path = "/smartspace/admin/actions/{adminSmartspace}/{adminEmail}",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ActionBoundary[] exportActions(
+			@PathVariable("adminSmartspace") String adminSmartspace,
+			@PathVariable("adminEmail") String adminEmail,
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+
+		return this.actionService.exportActions(size, page, adminSmartspace + "#" + adminEmail)
+				.stream()
+				.map(ActionBoundary::new)
+				.collect(Collectors.toList())
 				.toArray(new ActionBoundary[0]);
 	}
 
-	@RequestMapping(path = "/actiondemo/{pattern}/{sortBy}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ActionBoundary[] getActions(@PathVariable("pattern") String pattern, @PathVariable("sortBy") String sortBy,
-			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
-			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return this.actionService.getActionsByPattern(pattern, sortBy, size, page).stream().map(ActionBoundary::new)
-				.collect(Collectors.toList()).toArray(new ActionBoundary[0]);
+	@RequestMapping(
+			path = "/smartspace/actions",
+			method = RequestMethod.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ActionBoundary invokeAnAction(
+			@RequestBody ActionBoundary action) {
+
+		return new ActionBoundary(this.actionService.invokeAnAction(action.convertToEntity()));
+
 	}
 
 }

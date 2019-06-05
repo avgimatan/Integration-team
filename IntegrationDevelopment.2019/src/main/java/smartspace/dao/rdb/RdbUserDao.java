@@ -34,47 +34,48 @@ public class RdbUserDao implements AdvancedUserDao<String> {
 	@Override
 	@Transactional
 	public UserEntity create(UserEntity user) {
-		user.setKey(smartspace + "#" + user.getUserEmail());
+		if (user.getUserSmartspace() != null && user.getUserEmail() != null)
+			user.setKey(user.getUserSmartspace() + "#" + user.getUserEmail());
+		else
+			user.setKey(smartspace + "#" + user.getUserEmail());
 
 		// SQL: INSERT
 		if (!this.userCrud.existsById(user.getKey())) {
 			return this.userCrud.save(user);
 		} else {
-			throw new RuntimeException("message already exists with key: " + user.getKey());
+			throw new RuntimeException("user already exists with key: " + user.getKey());
 		}
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Optional<UserEntity> readById(String key) {
 		// SQL: SELECT
 		return this.userCrud.findById(key);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<UserEntity> readAll() {
 		List<UserEntity> rv = new ArrayList<>();
 		// SQL: SELECT
-		this.userCrud.findAll()
-			.forEach(rv::add);
+		this.userCrud.findAll().forEach(rv::add);
 		return rv;
 	}
 
 	@Override
 	@Transactional
 	public void update(UserEntity user) {
-		UserEntity existing = 
-				this.readById(user.getKey())
-				.orElseThrow(()->new RuntimeException("no message entity with key: " + user.getKey()));
-			
+		UserEntity existing = this.readById(user.getKey())
+				.orElseThrow(() -> new RuntimeException("no user entity with key: " + user.getKey()));
+
 		if (user.getAvatar() != null) {
 			existing.setAvatar(user.getAvatar());
 		}
 		if (user.getRole() != null) {
 			existing.setRole(user.getRole());
 		}
-		if (user.getUserEmail()!= null) {
+		if (user.getUserEmail() != null) {
 			existing.setUserEmail(user.getUserEmail());
 		}
 		if (user.getUsername() != null) {
@@ -83,7 +84,8 @@ public class RdbUserDao implements AdvancedUserDao<String> {
 		if (user.getUserSmartspace() != null) {
 			existing.setUserSmartspace(user.getUserSmartspace());
 		}
-		existing.setPoints(user.getPoints());
+		if (user.getPoints() != 0)
+			existing.setPoints(user.getPoints());
 		// SQL: UPDATE
 		this.userCrud.save(existing);
 	}
@@ -109,26 +111,8 @@ public class RdbUserDao implements AdvancedUserDao<String> {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<UserEntity> readUsersByUsernamePattern(String username, int size, int page) {
-		return this.userCrud.findAllByUsernameLike("%" + username + "%", PageRequest.of(page, size));
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<UserEntity> readUsersByUsernamePattern(String username, String sortBy, int size, int page) {
-		return this.userCrud.findAllByUsernameLike("%" + username + "%", PageRequest.of(page, size, Direction.ASC, sortBy));
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<UserEntity> readUsersByUserEmailPattern(String userEmail, int size, int page) {
-		return this.userCrud.findAllByKeyLike("%" + userEmail + "%", PageRequest.of(page, size));
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<UserEntity> readUsersByUserEmailPattern(String userEmail, String sortBy, int size, int page) {
-		return this.userCrud.findAllByKeyLike("%" + userEmail + "%", PageRequest.of(page, size, Direction.ASC, sortBy));
+	public List<UserEntity> getUsersByKey(String key, int page, int size) {
+		return this.userCrud.findAllByKeyLike("%" + key + "%", PageRequest.of(page, size));
 	}
 
 }

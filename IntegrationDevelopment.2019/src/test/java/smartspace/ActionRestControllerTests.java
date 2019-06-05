@@ -3,9 +3,9 @@ package smartspace;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
@@ -19,7 +19,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import smartspace.dao.ActionDao;
+import smartspace.dao.AdvancedElementDao;
+import smartspace.dao.AdvancedUserDao;
 import smartspace.data.ActionEntity;
+import smartspace.data.ElementEntity;
+import smartspace.data.Location;
+import smartspace.data.UserEntity;
+import smartspace.data.UserRole;
 import smartspace.layout.ActionBoundary;
 import smartspace.logic.ActionService;
 
@@ -34,11 +40,15 @@ public class ActionRestControllerTests {
 	private String baseUrl;
 	private RestTemplate restTemplate;
 	private ActionDao actionDao;
+	private AdvancedElementDao<String> elementDao;
 	private ActionService actionService;
+	private AdvancedUserDao<String> userDao;
 
 	@Autowired
-	public void setActionService(ActionService actionService) {
+	public void setActionService(ActionService actionService, AdvancedUserDao<String> userDao, AdvancedElementDao<String> elementDao) {
 		this.actionService = actionService;
+		this.userDao = userDao;
+		this.elementDao = elementDao;
 	}
 
 
@@ -55,208 +65,165 @@ public class ActionRestControllerTests {
 
 	@PostConstruct
 	public void init(){
-		this.baseUrl = "http://localhost:" + port + "/actiondemo";
+		this.baseUrl = "http://localhost:" + port + "/smartspace";
 		this.restTemplate = new RestTemplate();
 	}
 
 	@After
 	public void tearDown() {
-		this.actionDao
-		.deleteAll();
+		this.actionDao.deleteAll();
+		this.userDao.deleteAll();
 	}
 
 	@Test
-	public void testWriteAction() throws Exception{
-		// GIVEN the database is clean 
+	public void testImportAction() {
+		// GIVEN the database contains only 1 admin
+		UserEntity user = new UserEntity();
+		user.setRole(UserRole.ADMIN);
+		user.setUserEmail("matan@mail.com");
+		user.setAvatar("monkey");
+		user.setPoints(13);
+		user.setUsername("matan");
+		user = userDao.create(user);
+		
+		// WHEN i import action from other smartspace
+		
+		ActionBoundary[] ActionArray = new ActionBoundary[1];
+		
+		ActionBoundary newAction = new ActionBoundary();
 
-		// WHEN I crate new Action
-		ActionBoundary newAction= new ActionBoundary();
+		Map<String, String> player = new HashMap<String, String>();
+		player.put("smartspace", "playerSmartspace");
+		player.put("email", "emailSmartspace");
+		newAction.setPlayer(player);
 		
-		newAction.setActionType("TypeTest");
-		newAction.setMoreAttributes((new HashMap<String, Object>()));
+		Map<String, String> element = new HashMap<String, String>();
+		element.put("id", "12");
+		element.put("smartspace", "elementSmartspace");
+		newAction.setElement(element);
 		
-		newAction.setPlayerEmail("guy@walla.com");
-		newAction.setPlayerSmartspace("playerSmartspace");
-		newAction.setElementSmartspace("2019b.dana.zuka");
-		newAction.setElementId("2");
+		Map<String, String> key = new HashMap<String, String>();		
+		key.put("smartspace", "actionSmartspace");
+		key.put("id", "10");
+		newAction.setActionKey(key);
 		
+		newAction.setType("TypeTest");
+		newAction.setProperties(new HashMap<String, Object>());
 		
-		ActionBoundary response = this.restTemplate
-				.postForObject(
-						this.baseUrl, 
-						newAction, 
-						ActionBoundary.class);
-
-		// THEN the database contains 1 action
-		// AND the returned action is similar to the action in the database
-		assertThat(
-				this.actionDao.readAll())
-		.hasSize(1)
-		.usingElementComparatorOnFields("actionId")
-		.containsExactly(response.convertToEntity());
-
+		ActionArray[0] = newAction;
+		
+		ActionBoundary[] response =
+				this.restTemplate
+					.postForObject(
+					this.baseUrl + "/admin/actions/{adminSmartspace}/{adminEmail}", 
+					ActionArray, 
+					ActionBoundary[].class, user.getUserSmartspace(), user.getUserEmail());
+		
+		// THEN the database contain the new imported action
+		assertThat(this.actionDao.readAll())
+			.hasSize(1);
+			
+		assertThat(response)
+			.containsExactly(response[0]);
+		
+			assertThat(this.actionDao.readAll())
+				.usingElementComparatorOnFields("key")
+				.contains(response[0].convertToEntity());
+		
 	}
-
+	
+	
 	@Test
-	public void testWriteActionAndValidateReturnedKey() throws Exception{
-		// GIVEN the database is clean 
-
-		// WHEN I post a new Action
-		ActionBoundary newAction= new ActionBoundary();
-		newAction.setActionType("TypeTest");
-		newAction.setMoreAttributes((new HashMap<String, Object>()));
-		newAction.setPlayerEmail("guy@walla.com");
-		newAction.setPlayerSmartspace("playerSmartspace");
-		newAction.setElementId("999");
-		newAction.setElementSmartspace("ElementSmartspace");
+	public void testExportActionsUsingPagination() throws Exception {
+		// GIVEN the database contains 38 elements
 		
-		ActionBoundary response = this.restTemplate
-				.postForObject(
-						this.baseUrl, 
-						newAction, 
-						ActionBoundary.class);
+		// AND the database contains 1 admin user
+		UserEntity user = new UserEntity();
+		user.setRole(UserRole.ADMIN);
+		user.setUserEmail("matan@mail.com");
+		user.setAvatar("monkey");
+		user.setPoints(13);
+		user.setUsername("matan");
+		user = userDao.create(user);
 		
-		// THEN the returned Action json contains a key
-		assertThat(
-				response.getActionSmartspace()+
-				response.getActionId())
-		.isNotNull()
-		.isNotBlank()
-		.isNotEmpty();
-
-	}
-
-
-	@Test
-	public void testGetActionsUsingPagination() throws Exception{
-		// GIVEN the database contains 38 Actions
 		int totalSize = 38;
-		//@SuppressWarnings("unchecked")//back again to here 
+//		ActionEntity a = new ActionEntity(elementSmartspace, elementId, playerSmartspace,
+//				playerEmail, actionType, creationTimestamp, moreAttributes)
 		List<ActionEntity> all = 
-		IntStream.range(1, totalSize + 1)
-		.mapToObj(i->"Action #" + i)
-		.map(name->new ActionEntity( name,  "ElementID", "playerSmartspace", "guy@gmail.com",
-				"actionType", null, new HashMap<>()))
-		.map(this.actionService::writeAction)
-		.collect(Collectors.toList());
+				IntStream.range(1, totalSize + 1)
+				.mapToObj(i -> "element@mail" + i)
+				.map(email -> new ActionEntity("elementSmartspace", "12", "playerSmartspace", "playerEmail", "typeTest", 
+						new Date(), new HashMap<String, Object>()))
+				.map(this.actionDao::create).collect(Collectors.toList());
 
-			List<ActionBoundary> lastEight = 
-						all
-						.stream()
-						.skip(30)
-						.map(ActionBoundary::new)
-						.collect(Collectors.toList());
+		List<ActionBoundary> lastNine =
+				all.stream()
+				.skip(30)
+				.map(ActionBoundary::new )
+				.collect(Collectors.toList());
 
-				// WHEN I getElement using page #3 of size 10
-				int size = 10;
-				int page = 3;
-				ActionBoundary[] results = 
-						this.restTemplate
-						.getForObject(
-								this.baseUrl + "?size={size}&page={page}", 
-								ActionBoundary[].class, 
-								size, page);
-
-
-				// THEN the response contains 8 action
-				assertThat(results)
-				.usingElementComparatorOnFields("actionId", "creationTimestamp")
-				.containsExactlyElementsOf(lastEight);
-	}
-
-
-	@Test
-	public void testGetActionsUsingPaginationWithNoResult() throws Exception{
-		// GIVEN the database contains 30 Elements
-		int totalSize = 30;
-
-		IntStream.range(1, totalSize + 1)
-		.mapToObj(i->"action #" + i)
-		.map(text->new ActionEntity( "ActionSmartspace",  "actionID", "playerSmartspace", "guy@gmail.com",
-				"actionType", new Date(),new HashMap<>()))
-		.map(this.actionService::writeAction)
-		.collect(Collectors.toList());
-
-
-		// WHEN I getAction using page #3 of size 10
+		// WHEN I getElements using page #3 of size 10
 		int size = 10;
 		int page = 3;
-		ActionBoundary[] results = 
-				this.restTemplate
-				.getForObject(
-						this.baseUrl + "?size={size}&page={page}", 
-						ActionBoundary[].class, 
-						size, page);
-
-
-		// THEN the response contains no ElementS
+		ActionBoundary[] results =
+				this.restTemplate.
+				getForObject(this.baseUrl + "/admin/actions/{adminSmartspace}/{adminEmail}?page={page}&size={size}",
+						ActionBoundary[].class, "2019B.dana.zuka", "matan@mail.com", page, size);
+		
+		// THEN the response contains 8 user
+		
 		assertThat(results)
-		.isEmpty();
+		.hasSize(8);
+		
 	}
-
+	
 	@Test
-	public void testGetActionsUsingPaginationOfFirstPage() throws Exception{
-		// GIVEN the database contains 38 Elements
-		int totalSize = 38;
-
-		IntStream.range(1, totalSize + 1)
-		.mapToObj(i->"action #" + i)
-		.map(text->new ActionEntity( "ActionSmartspace",  "actionID", "playerSmartspace", "guy@gmail.com",
-				"actionType", new Date(),new HashMap<>()))
-		.map(this.actionService::writeAction)
-		.collect(Collectors.toList());
-
-		// WHEN I getAction using page #0 of size 100
-		int size = 100;
-		int page = 0;
-		ActionBoundary[] results = 
-				this.restTemplate
-				.getForObject(
-						this.baseUrl + "?size={size}&page={page}", 
-						ActionBoundary[].class, 
-						size, page);
-
-		// THEN the response contains 38 Action
-		assertThat(results)
-		.hasSize(totalSize);
+	public void testInvokeAnACtion() throws Exception{
+		//GIVEN the database is empty
+		
+		//WHEN I create a new action 
+	
+		UserEntity playerUser = new UserEntity();
+		playerUser.setRole(UserRole.PLAYER);
+		playerUser.setUserEmail("player@mail");
+		playerUser = userDao.create(playerUser);
+		
+		ActionBoundary newAction = new ActionBoundary();
+		
+		Map<String, String> player = new HashMap<String, String>();
+		player.put("smartspace", "2019B.dana.zuka");
+		player.put("email", "player@mail");
+		newAction.setPlayer(player);
+		
+		ElementEntity elementEn = new ElementEntity("name", "type", new Location(1, 1), new Date(), "creatorEmail", "2019B.dana.zuka", false, new HashMap<String, Object>());
+		elementEn = elementDao.create(elementEn);
+		
+		Map<String, String> element = new HashMap<String, String>();
+		element.put("id", elementEn.getElementId());
+		element.put("smartspace", elementEn.getElementSmartspace());
+		newAction.setElement(element);
+		
+		/*Map<String, String> key = new HashMap<String, String>();		
+		key.put("smartspace", "actionSmartspace");
+		key.put("id", "10");
+		newAction.setActionKey(key);*/
+		newAction.setActionKey(null);
+		newAction.setType("echo");
+		newAction.setProperties(new HashMap<String, Object>());
+		
+		ActionBoundary response = this.restTemplate
+				.postForObject(
+						this.baseUrl+"/actions",
+						newAction, 
+						ActionBoundary.class);
+		
+			// THEN the database contains 1 message
+			// AND the returned message is similar to the message in the database
+			assertThat(
+					this.actionDao.readAll())
+				.hasSize(1)
+			.usingElementComparatorOnFields("key")
+			.containsExactly(response.convertToEntity());
 	}
-
-	@Test
-	public void testGetActionsWithPattern() throws Exception{
-		// GIVEN the database contains 3 action with the name "abc"
-		// AND the database contains 2 more action without the name "abc"
-
-		String pattern = "abc";
-
-		List<ActionEntity> all = 
-				Stream.of("abc", "abxyzabc", "xyabczz",
-						"urjmdl", "ababbac")
-				.map(text->new ActionEntity(text,  "actionID", "playerSmartspace", "guy@gmail.com",
-						"actionType", null,new HashMap<>()))
-				.map(this.actionService::writeAction)
-				.collect(Collectors.toList());
-
-		List<ActionBoundary> actionWithPattern = 
-				all
-				.stream()
-				.filter(act->act.getActionType().contains(pattern))
-				.map(ActionBoundary::new)
-				.collect(Collectors.toList());
-
-		// WHEN I getAction using pattern using page #0 of size 100 with pattern "abc"
-		int size = 100;
-		int page = 0;
-		ActionBoundary[] results = 
-			this.restTemplate
-				.getForObject(
-						this.baseUrl + "/{pattern}/{sortBy}?size={size}&page={page}", 
-						ActionBoundary[].class, 
-						pattern, "elementSmartspace",
-						size, page);
-
-		// THEN the response contains 3 Actions with "abc" text pattern
-		assertThat(results)
-		.usingElementComparatorOnFields("elementSmartspace")
-		.containsExactlyInAnyOrderElementsOf(actionWithPattern);
+	
 	}
-}

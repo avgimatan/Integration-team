@@ -9,28 +9,26 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
-
 import smartspace.dao.ElementDao;
 import smartspace.data.ElementEntity;
 
 //@Repository
-public class MemoryElementDao implements ElementDao<String>{
+public class MemoryElementDao implements ElementDao<String> {
 
 	private Map<String, ElementEntity> memory;
 	private AtomicLong serial;
 	private String smartspace;
-	
+
 	public MemoryElementDao() {
 		this.memory = Collections.synchronizedSortedMap(new TreeMap<>());
 		this.serial = new AtomicLong(1L);
 	}
-	
+
 	@Value("${smartspace.name:smartspace}")
 	public void setSmartspace(String smartspace) {
 		this.smartspace = smartspace;
 	}
-	
+
 	@Override
 	public ElementEntity create(ElementEntity elementEntity) {
 		elementEntity.setKey(smartspace + "#" + serial.getAndIncrement());
@@ -44,7 +42,7 @@ public class MemoryElementDao implements ElementDao<String>{
 		ElementEntity element = this.memory.get(elementKey);
 		if (element != null) {
 			return Optional.of(element);
-		}else {
+		} else {
 			return Optional.empty();
 		}
 	}
@@ -56,44 +54,43 @@ public class MemoryElementDao implements ElementDao<String>{
 
 	@Override
 	public void update(ElementEntity updateElementEntity) {
-		ElementEntity existing = 
-				this.readById(updateElementEntity.getKey())
-				.orElseThrow(()->new RuntimeException("no element entity with key: " + updateElementEntity.getKey()));
-		
-		if(updateElementEntity.getLocation() != null) {
+		ElementEntity existing = this.readById(updateElementEntity.getKey())
+				.orElseThrow(() -> new RuntimeException("no element entity with key: " + updateElementEntity.getKey()));
+
+		if (updateElementEntity.getLocation() != null) {
 			existing.setLocation(updateElementEntity.getLocation());
 		}
-		if(updateElementEntity.getName() != null) {
+		if (updateElementEntity.getName() != null) {
 			existing.setName(updateElementEntity.getName());
 		}
-		if(updateElementEntity.getType() != null) {
+		if (updateElementEntity.getType() != null) {
 			existing.setType(updateElementEntity.getType());
 		}
-		if(updateElementEntity.getMoreAttributes() != null) {
+		if (updateElementEntity.getMoreAttributes() != null) {
 			existing.setMoreAttributes(updateElementEntity.getMoreAttributes());
 		}
-		if(updateElementEntity.getCreationTimestamp() != null) {
+		if (updateElementEntity.getCreationTimestamp() != null) {
 			existing.setCreationTimestamp(updateElementEntity.getCreationTimestamp());
 		}
-		if(updateElementEntity.getCreatorEmail() != null) {
+		if (updateElementEntity.getCreatorEmail() != null) {
 			existing.setCreatorEmail(updateElementEntity.getCreatorEmail());
 		}
-		if(updateElementEntity.getCreatorSmartspace() != null) {
+		if (updateElementEntity.getCreatorSmartspace() != null) {
 			existing.setCreatorSmartspace(updateElementEntity.getCreatorSmartspace());
 		}
 		existing.setExpired(updateElementEntity.getExpired());
-			
+
 	}
 
 	@Override
 	public void deleteByKey(String elementKey) {
-		if(this.memory.containsKey(elementKey))
+		if (this.memory.containsKey(elementKey))
 			this.memory.remove(elementKey);
 	}
 
 	@Override
 	public void delete(ElementEntity elementEntity) {
-		if(this.memory.containsValue(elementEntity))
+		if (this.memory.containsValue(elementEntity))
 			this.memory.remove(elementEntity.getKey());
 	}
 

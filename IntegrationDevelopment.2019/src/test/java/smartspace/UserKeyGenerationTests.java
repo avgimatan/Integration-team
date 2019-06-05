@@ -43,14 +43,17 @@ public class UserKeyGenerationTests {
 	@Test
 	public void testCreateUsersAndVerifyUniqueKeys() throws Exception {
 		// GIVEN clean database
-
+		
 		// WHEN I create 2 users
 		int size = 2;
 
-		UserEntity userOne = this.factory.createNewUser("Tst1@Afeka", "2019b.dana.zuka", "shalev", "afeka", UserRole.ADMIN,
-				100);
-		UserEntity userTwo = this.factory.createNewUser("Tst2@Afeka", "2019b.dana.zuka", "shalev", "afeka", UserRole.ADMIN,
-				100);
+		UserEntity userOne = this.factory.createNewUser(
+				"Tst1@mail", "2019b.dana.zuka", "shalev", "afeka", UserRole.ADMIN, 100);
+		UserEntity userTwo = this.factory.createNewUser(
+				"Tst2@mail", "2019b.dana.zuka", "shalev", "afeka", UserRole.ADMIN,100);
+		
+		//System.err.println(userOne.getKey());
+		//System.err.println(userTwo.getKey());
 		
 		TreeSet<String> KeysSet = new TreeSet<String>();
 		KeysSet.add(userOne.getKey());

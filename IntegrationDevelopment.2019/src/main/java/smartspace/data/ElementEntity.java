@@ -3,25 +3,19 @@ package smartspace.data;
 import java.util.Date;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import smartspace.dao.rdb.MapToJsonConverter;
-
-@Entity
-@Table(name = "ELEMENTS")
+@Document(collection = "ELEMENTS")
 public class ElementEntity implements SmartspaceEntity<String> {
 
+	@Transient
 	private String elementSmartspace;
+	
+	@Transient
 	private String elementId;
+	
 	private Location location;
 	private String name;
 	private String type;
@@ -30,6 +24,8 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	private String creatorSmartspace; // the smartSpace of the other user who create the element
 	private String creatorEmail;
 	private Map<String, Object> moreAttributes;
+	// mongoDB requirement this attribute 
+	private String key;
 
 	public ElementEntity() {
 	}
@@ -48,7 +44,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 
 	}
 
-	@Transient
 	public String getElementId() {
 		return elementId;
 	}
@@ -57,7 +52,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.elementId = elementId;
 	}
 
-	@Transient
 	public String getElementSmartspace() {
 		return this.elementSmartspace;
 	}
@@ -82,7 +76,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.type = type;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
 	public Date getCreationTimestamp() {
 		return creationTimestamp;
 	}
@@ -115,8 +108,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.creatorEmail = creatorEmail;
 	}
 
-	@Lob
-	@Convert(converter = MapToJsonConverter.class)
 	public Map<String, Object> getMoreAttributes() {
 		return moreAttributes;
 	}
@@ -125,7 +116,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
-	@Embedded
 	public Location getLocation() {
 		return location;
 	}
@@ -134,17 +124,16 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.location = location;
 	}
 
-	@Override
 	@Id
-	@Column(name="ID")
 	public String getKey() {
-		return this.elementSmartspace + "#" + this.elementId;
+		return this.key;
 	}
 
 	@Override
 	public void setKey(String key) {
 		this.elementSmartspace = key.split("#")[0];
 		this.elementId = key.split("#")[1];
+		this.key = key;
 	}
 
 	@Override

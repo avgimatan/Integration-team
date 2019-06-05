@@ -21,12 +21,10 @@ public class EntityFactoryImpl implements EntityFactory {
 	}
 
 	@Override
-	public ElementEntity createNewElement(String name, String type,Location location,
-			Date creationTimestamp,String creatorEmail,
-			String creatorSmartspace, boolean expired,
-			Map<String, Object> moreAttributes) {
-		return new ElementEntity(name, type, location,
-				 creationTimestamp, creatorEmail, creatorSmartspace,  expired,moreAttributes);
+	public ElementEntity createNewElement(String name, String type, Location location, Date creationTimestamp,
+			String creatorEmail, String creatorSmartspace, boolean expired, Map<String, Object> moreAttributes) {
+		return new ElementEntity(name, type, location, creationTimestamp, creatorEmail, creatorSmartspace, expired,
+				moreAttributes);
 	}
 
 	@Override

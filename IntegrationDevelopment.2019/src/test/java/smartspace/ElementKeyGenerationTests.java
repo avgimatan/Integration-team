@@ -48,7 +48,7 @@ public class ElementKeyGenerationTests {
 	@Test
 	public void testCreateElementsAndVerifyUniqueKeys() throws Exception {
 		// GIVEN clean database
-
+		this.elementDao.deleteAll();
 		// WHEN I create 20 elements
 				int size = 20;
 				Set<String> keysSet = 

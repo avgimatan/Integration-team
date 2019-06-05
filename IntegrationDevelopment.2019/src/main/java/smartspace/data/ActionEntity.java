@@ -3,6 +3,7 @@ package smartspace.data;
 import java.util.Date;
 import java.util.Map;
 
+/*
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -14,13 +15,22 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import smartspace.dao.rdb.MapToJsonConverter;
+*/
 
-@Entity
-@Table(name = "ACTIONS")
+// after change to mongoDB
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "ACTIONS")
 public class ActionEntity implements SmartspaceEntity<String> {
-
+	
+	@Transient
 	private String actionSmartspace;
+	
+	@Transient
 	private String actionId;
+	
 	private String elementSmartspace;
 	private String elementId;
 	private String playerSmartspace;
@@ -28,6 +38,8 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	private String actionType;
 	private Date creationTimestamp;
 	private Map<String, Object> moreAttributes;
+	// mongoDB requirement this attribute 
+	private String key;
 
 	public ActionEntity() {
 	}
@@ -44,7 +56,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
-	@Transient
 	public String getActionSmartspace() {
 		return actionSmartspace;
 	}
@@ -93,7 +104,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.actionType = actionType;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
 	public Date getCreationTimestamp() {
 		return creationTimestamp;
 	}
@@ -102,8 +112,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.creationTimestamp = creationTimestamp;
 	}
 
-	@Lob
-	@Convert(converter = MapToJsonConverter.class)
 	public Map<String, Object> getMoreAttributes() {
 		return moreAttributes;
 	}
@@ -112,7 +120,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.moreAttributes = moreAttributes;
 	}
 
-	@Transient
 	public String getActionId() {
 		return actionId;
 	}
@@ -122,16 +129,15 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	}
 
 	@Id
-	@Override
-	@Column(name="ID")
 	public String getKey() {
-		return this.actionSmartspace + "#" + this.actionId;
+		return this.key;
 	}
 
 	@Override
 	public void setKey(String key) {
 		this.actionSmartspace = key.split("#")[0];
 		this.actionId = key.split("#")[1];
+		this.key = key;
 	}
 
 	@Override

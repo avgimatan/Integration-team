@@ -13,9 +13,11 @@ public interface ActionCrud extends PagingAndSortingRepository<ActionEntity, Str
 
 	public List<ActionEntity> findAllByPlayerEmailLike(@Param("pattern") String pattern, Pageable pageable);
 
-	//there is elementId attribute in ActionEntity
 	public List<ActionEntity> findByElementIdLike(@Param("pattern") String pattern, Pageable pageable);
 
 	public List<ActionEntity> findAllByCreationTimestampBetween(@Param("fromDate") Date fromDate,
 			@Param("toDate") Date toDate, Pageable pageable);
+	
+	public List<ActionEntity> findAllByCreationTimestampLike(
+			@Param("creationTimestamp") Date stamp, Pageable pageable);
 }

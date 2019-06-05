@@ -1,70 +1,58 @@
 package smartspace.layout;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import smartspace.data.ElementEntity;
 import smartspace.data.Location;
 
-
 public class ElementBoundary {
 
-	private String elementSmartspace;
-	private String elementId;
-	private String location;
+	private Map<String, String> key;
+	private String elementType;
 	private String name;
-	private String type;
-	private Date creationTimestamp;
 	private boolean expired;
-	private String creatorSmartspace; // the smartSpace of the other user who create the element
-	private String creatorEmail;
-	private Map<String, Object> moreAttributes;
+	private Date created;
+	private Map<String, String> creator;
+	private Map<String, Double> latlng;
+	private Map<String, Object> elementProperties;
 
 	public ElementBoundary() {
-		
 	}
-	
+
 	public ElementBoundary(ElementEntity entity) {
-		Location loc=entity.getLocation();
-		if (loc!= null) {
-		this.location = entity.getLocation().getX()+"#"+entity.getLocation().getY();
-		}else {
-			this.location=null;
-		}
-		this.creationTimestamp = entity.getCreationTimestamp();
+		this.key = new HashMap<>();
+		this.key.put("id", entity.getElementId());
+		this.key.put("smartspace", entity.getElementSmartspace());
+		this.elementType = entity.getType();
 		this.name = entity.getName();
-		this.type = entity.getType();
-		this.moreAttributes = entity.getMoreAttributes();
 		this.expired = entity.getExpired();
-		this.elementSmartspace = entity.getElementSmartspace();// getKey().split("#")[0];
-		this.elementId = entity.getElementId();// getKey().split("#")[1];
-		this.creatorSmartspace = entity.getCreatorSmartspace();
-		this.creatorEmail = entity.getCreatorEmail();
-
+		this.created = entity.getCreationTimestamp();
+		this.creator = new HashMap<>();
+		this.creator.put("email", entity.getCreatorEmail());
+		this.creator.put("smartspace", entity.getCreatorSmartspace());
+		this.latlng = new HashMap<>();
+		this.latlng.put("lat", Double.valueOf(entity.getLocation().getX()));
+		this.latlng.put("lng", Double.valueOf(entity.getLocation().getY()));
+		this.elementProperties = new HashMap<>();
+		this.elementProperties = entity.getMoreAttributes();
 	}
 
-	public String getElementSmartspace() {
-		return elementSmartspace;
+	public Map<String, String> getKey() {
+		return key;
 	}
 
-	public void setElementSmartspace(String elementSmartspace) {
-		this.elementSmartspace = elementSmartspace;
+	public void setKey(Map<String, String> key) {
+		this.key = key;
 	}
 
-	public String getElementId() {
-		return elementId;
+	public String getElementType() {
+		return elementType;
 	}
 
-	public void setElementId(String elementId) {
-		this.elementId = elementId;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
+	public void setElementType(String elementType) {
+		this.elementType = elementType;
 	}
 
 	public String getName() {
@@ -75,22 +63,6 @@ public class ElementBoundary {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public Date getCreationTimestamp() {
-		return creationTimestamp;
-	}
-
-	public void setCreationTimestamp(Date creationTimestamp) {
-		this.creationTimestamp = creationTimestamp;
-	}
-
 	public boolean isExpired() {
 		return expired;
 	}
@@ -99,62 +71,75 @@ public class ElementBoundary {
 		this.expired = expired;
 	}
 
-	public String getCreatorSmartspace() {
-		return creatorSmartspace;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setCreatorSmartspace(String creatorSmartspace) {
-		this.creatorSmartspace = creatorSmartspace;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
-	public String getCreatorEmail() {
-		return creatorEmail;
+	public Map<String, String> getCreator() {
+		return creator;
 	}
 
-	public void setCreatorEmail(String creatorEmail) {
-		this.creatorEmail = creatorEmail;
+	public void setCreator(Map<String, String> creator) {
+		this.creator = creator;
 	}
 
-	public Map<String, Object> getMoreAttributes() {
-		return moreAttributes;
+	public Map<String, Double> getLatlng() {
+		return latlng;
+	}
+
+	public void setLatlng(Map<String, Double> latlng) {
+		this.latlng = latlng;
+	}
+
+	public Map<String, Object> getElementProperties() {
+		return elementProperties;
+	}
+
+	public void setElementProperties(Map<String, Object> elementProperties) {
+		this.elementProperties = elementProperties;
 	}
 
 	public ElementEntity convertToEntity() {
 		ElementEntity entity = new ElementEntity();
-		entity.setKey(this.elementSmartspace + '#' + this.elementId);
-		
-		entity.setLocation(null);
-		if(this.location!=null&& this.location.contains("#")) {
-			
 
-			String[] args = this.location.split("#");
-			if (args.length == 2) {
-				entity.setLocation(new Location(Double.parseDouble( args[0]),Double.parseDouble( args[1])));
-			}
+		if (this.key != null && this.key.get("smartspace") != null && this.key.get("id") != null
+				&& !this.key.get("smartspace").trim().isEmpty() && !this.key.get("id").trim().isEmpty())
+			entity.setKey(this.key.get("smartspace") + "#" + this.key.get("id"));
+		
+		Location l = new Location();
+		if (this.latlng != null && this.latlng.get("lat") != null && this.latlng.get("lng") != null) {
+			l.setX(this.latlng.get("lat"));
+			l.setY(this.latlng.get("lng"));
 		}
-		entity.setCreationTimestamp(this.creationTimestamp);
+		entity.setLocation(l);
 		entity.setName(this.name);
-		entity.setType(this.type);
-		
-		entity.setMoreAttributes(this.moreAttributes);
-		
+		entity.setType(this.elementType);
 		entity.setExpired(this.expired);
-		entity.setCreatorSmartspace(this.creatorSmartspace);
-		entity.setCreatorEmail(this.creatorEmail);
-		entity.setElementSmartspace(this.elementSmartspace);
-		entity.setElementId(this.elementId);
+		if (this.creator != null && this.creator.get("smartspace") != null && this.creator.get("email") != null
+				&& !this.creator.get("smartspace").trim().isEmpty() && !this.creator.get("email").trim().isEmpty()) {
+			entity.setCreatorSmartspace(this.creator.get("smartspace"));
+			entity.setCreatorEmail(this.creator.get("email"));
 
+		}
+		entity.setCreationTimestamp(this.created);
+		
+		if(this.elementProperties != null)
+			entity.setMoreAttributes(this.elementProperties);
+		else
+			entity.setMoreAttributes(new HashMap<>());
+		
 		return entity;
 	}
 
-	public void setMoreAttributes(Map<String, Object> moreAttributes) {
-		this.moreAttributes = moreAttributes;
-	}
-
 	public String toString() {
-		return "ElementBoundary [elementSmartspace=" + elementSmartspace + ", elementId=" + elementId + ", location="
-				+ location + ", name=" + name + ", type=" + type + ", creationTimestamp=" + creationTimestamp
-				+ ", expired=" + expired + ", creatorSmartspace=" + creatorSmartspace + ", creatorEmail=" + creatorEmail
-				+ ", moreAttributes=" + moreAttributes + "]";
+		return "ElementBoundary [elementSmartspace=" + this.key.get("smartspace") + ", elementId=" + this.key.get("id")
+				+ ", latlng=(" + this.latlng.get("lat") + ", " + this.latlng.get("lng") + ")" + ", name=" + name
+				+ ", elementType=" + this.elementType + ", created=" + this.created + ", expired=" + expired
+				+ ", creatorSmartspace=" + this.creator.get("smartspce") + ", creatorEmail=" + this.creator.get("email")
+				+ ", elementProperties=" + this.elementProperties + "]";
 	}
 }

@@ -16,4 +16,5 @@ import smartspace.data.UserEntity;
 		
 	public void deleteAll();
 
+	
 }

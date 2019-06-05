@@ -1,16 +1,13 @@
 package smartspace.data;
 
-import javax.persistence.Embeddable;
-
-@Embeddable
 public class Location {
-	
+
 	private double x;
 	private double y;
-	
-	public Location(){
+
+	public Location() {
 	}
-	
+
 	public double getX() {
 		return x;
 	}
@@ -32,10 +29,10 @@ public class Location {
 	public void setY(double y) {
 		this.y = y;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "(" + getX() + "," + getY() + ")";
 	}
-	
+
 }

@@ -46,7 +46,7 @@ public class MemoryActionDao implements ActionDao{
 	public void deleteAll() {
 		this.memory.clear();
 	}
-	
+
 	
 	
 }

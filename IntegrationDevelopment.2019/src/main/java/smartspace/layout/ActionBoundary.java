@@ -1,132 +1,118 @@
 package smartspace.layout;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import smartspace.data.ActionEntity;
 
 public class ActionBoundary {
 
-	private String actionSmartspace;
-	private String actionId;
-	private String elementSmartspace;
-	private String elementId;
-	private String playerSmartspace;
-	private String playerEmail;
-	private String actionType;
-	private Date creationTimestamp;
-	private Map<String, Object> moreAttributes;
+	private Map<String, String> actionKey;
+	private String type;
+	private Date created;
+	private Map<String, String> element;
+	private Map<String, String> player;
+	private Map<String, Object> properties;
 
 	public ActionBoundary() {
 	}
 
-	public ActionBoundary(ActionEntity action) {
-		this.actionSmartspace = action.getActionSmartspace();
-		this.actionId = action.getActionId();
-		this.elementSmartspace = action.getElementSmartspace();
-		this.elementId = action.getElementId();
-		this.playerSmartspace = action.getPlayerSmartspace();
-		this.playerEmail = action.getPlayerEmail();
-		this.actionType = action.getActionType();
-		this.creationTimestamp = action.getCreationTimestamp();
-		this.moreAttributes = action.getMoreAttributes();
+	public ActionBoundary(ActionEntity entity) {
+		this.actionKey = new HashMap<>();
+		this.actionKey.put("smartspace", entity.getActionSmartspace());
+		this.actionKey.put("id", entity.getActionId());
+		this.type = entity.getActionType();
+		this.created = entity.getCreationTimestamp();
+		this.element = new HashMap<>();
+		this.element.put("id", entity.getElementId());
+		this.element.put("smartspace", entity.getElementSmartspace());
+		this.player = new HashMap<>();
+		this.player.put("smartspace", entity.getPlayerSmartspace());
+		this.player.put("email", entity.getPlayerEmail());
+		this.properties = entity.getMoreAttributes();
+	}
 
+	public Map<String, String> getActionKey() {
+		return actionKey;
+	}
+
+	public void setActionKey(Map<String, String> actionKey) {
+		this.actionKey = actionKey;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Map<String, String> getElement() {
+		return element;
+	}
+
+	public void setElement(Map<String, String> element) {
+		this.element = element;
+	}
+
+	public Map<String, String> getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(Map<String, String> player) {
+		this.player = player;
+	}
+
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
 	}
 
 	public ActionEntity convertToEntity() {
-		ActionEntity action = new ActionEntity();
-		action.setKey(this.actionSmartspace + "#" + this.actionId);
-		action.setActionSmartspace(this.getActionSmartspace());
-		action.setActionId(this.getActionId());
-		action.setElementSmartspace(this.getElementSmartspace());
-		action.setElementId(this.getElementId());
-		action.setPlayerSmartspace(this.getPlayerSmartspace());
-		action.setPlayerEmail(this.getPlayerEmail());
-		action.setActionType(this.getActionType());
-		action.setCreationTimestamp(this.getCreationTimestamp());
-		action.setMoreAttributes(this.getMoreAttributes());
+		ActionEntity entity = new ActionEntity();
+		if (this.actionKey != null && this.actionKey.get("smartspace")!= null && this.actionKey.get("id")!= null
+				&& !this.actionKey.get("smartspace").trim().isEmpty()
+				&& !this.actionKey.get("id").trim().isEmpty() )
+			entity.setKey(this.actionKey.get("smartspace") + "#" + this.actionKey.get("id"));
+		
+		if (this.element != null && this.element.get("smartspace")!= null && this.element.get("id")!= null) {
+			entity.setElementId(this.element.get("id"));
+			entity.setElementSmartspace(this.element.get("smartspace"));
+		}
+		if (this.player != null && this.player.get("smartspace")!= null && this.player.get("email")!= null) {
+			entity.setPlayerEmail(this.player.get("email"));
+			entity.setPlayerSmartspace(this.player.get("smartspace"));
+		}
 
-		return action;
+		entity.setActionType(this.type);
+		entity.setCreationTimestamp(this.created);
+		
+		if(this.properties != null)
+			entity.setMoreAttributes(this.properties);
+		else
+			entity.setMoreAttributes(new HashMap<>());
+		
+		return entity;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "ActionBoundary [actionSmartspace=" + actionSmartspace + ", userId=" + actionId + ", elementSmartspace="
-				+ elementSmartspace + ", elementId=" + elementId + ", playerSmartspace=" + playerSmartspace
-				+ ", playerEmail=" + playerEmail + ",actionType=" + actionType + ",creationTimestamp"
-				+ creationTimestamp + ",moreAttributes" + moreAttributes + "]";
+		return "ActionBoundary [actionSmartspace=" + this.actionKey.get("smartspace") + ", userId=" + this.actionKey.get("id") + ", elementSmartspace="
+				+ this.element.get("smartspace") + ", elementId=" + this.element.get("id") + ", playerSmartspace=" + this.player.get("smartspace")
+				+ ", playerEmail=" + this.player.get("email") + ",actionType=" + this.type + ",creationTimestamp"
+				+ this.created + ",moreAttributes" + this.properties + "]";
 	}
-
-	public String getActionSmartspace() {
-		return actionSmartspace;
-	}
-
-	public void setActionSmartspace(String actionSmartspace) {
-		this.actionSmartspace = actionSmartspace;
-	}
-
-	public String getActionId() {
-		return actionId;
-	}
-
-	public void setActionId(String actionId) {
-		this.actionId = actionId;
-	}
-
-	public String getElementSmartspace() {
-		return elementSmartspace;
-	}
-
-	public void setElementSmartspace(String elementSmartspace) {
-		this.elementSmartspace = elementSmartspace;
-	}
-
-	public String getElementId() {
-		return elementId;
-	}
-
-	public void setElementId(String elementId) {
-		this.elementId = elementId;
-	}
-
-	public String getPlayerSmartspace() {
-		return playerSmartspace;
-	}
-
-	public void setPlayerSmartspace(String playerSmartspace) {
-		this.playerSmartspace = playerSmartspace;
-	}
-
-	public String getPlayerEmail() {
-		return playerEmail;
-	}
-
-	public void setPlayerEmail(String playerEmail) {
-		this.playerEmail = playerEmail;
-	}
-
-	public String getActionType() {
-		return actionType;
-	}
-
-	public void setActionType(String actionType) {
-		this.actionType = actionType;
-	}
-
-	public Date getCreationTimestamp() {
-		return creationTimestamp;
-	}
-
-	public void setCreationTimestamp(Date creationTimestamp) {
-		this.creationTimestamp = creationTimestamp;
-	}
-
-	public Map<String, Object> getMoreAttributes() {
-		return moreAttributes;
-	}
-
-	public void setMoreAttributes(Map<String, Object> moreAttributes) {
-		this.moreAttributes = moreAttributes;
-	}
-
 }

@@ -2,19 +2,9 @@ package smartspace.dao.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import smartspace.data.ElementEntity;
-import smartspace.data.Location;
-import smartspace.data.util.EntityFactory;
 
 public class MemoryElementDaoReadAllUnitTest {
 	

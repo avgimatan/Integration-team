@@ -4,29 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.support.BeanDefinitionDsl.Role;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import smartspace.dao.UserDao;
 import smartspace.dao.ActionDao;
 import smartspace.dao.ElementDao;
-import smartspace.dao.UserDao;
 import smartspace.data.UserEntity;
 import smartspace.data.ActionEntity;
 import smartspace.data.ElementEntity;
 import smartspace.data.Location;
-import smartspace.data.UserEntity;
 import smartspace.data.UserRole;
 import smartspace.data.util.EntityFactory;
 
@@ -88,30 +80,8 @@ public class RdbUserEntityIntegrationTests {
 		user = this.userDao.create(user);
 				
 		// THEN the user is stored 
-		// TODO
 		assertThat(this.userDao.readAll().contains(user));
 	}
-	/*
-	@Test
-	public void testCreateUserAndVerifyUniqueKeys () throws Exception{
-		// GIVEN clean database 
-
-		// WHEN I create 30 Userss
-		int size = 30;
-		Set<String> keysSet = 
-				IntStream
-				.range(1, size + 1) //Integer Stream
-				.mapToObj(i->this.factory
-				.createNewUser(action.getPlayerEmail(), action.getActionSmartspace(),
-						"username", "avatar", UserRole.PLAYER,1)
-				.map(this.userDao::create)// 
-				.map(UserEntity::getKey) // String Stream
-				.collect(Collectors.toSet());
-
-		// THEN they all have unique keys
-		assertThat(keysSet)
-		.hasSize(size);
-	}*/
 }
 	
 

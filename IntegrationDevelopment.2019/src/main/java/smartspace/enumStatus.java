@@ -1,6 +1,6 @@
 package smartspace;
 
 public enum enumStatus {
-	Complete, InProcess;
+	TO_DO, IN_PROGRESS,DONE;
 
 }
